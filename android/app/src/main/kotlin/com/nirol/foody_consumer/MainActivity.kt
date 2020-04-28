@@ -1,4 +1,4 @@
-package com.example.foody_consumer
+package com.nirol.foody_consumer
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
