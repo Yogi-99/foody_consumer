@@ -24,7 +24,6 @@ class RestaurantService {
 
   Future<List<Meal>> getMeals(Restaurant restaurant) async {
     List<Meal> meals = [];
-    print('rest id: ${restaurant.id}');
     DocumentSnapshot documentSnapshot =
         await _db.collection(MEALS_COLLECTION).document(restaurant.id).get();
 
@@ -36,16 +35,12 @@ class RestaurantService {
   }
 
   placeOrder(Order order) {
-    print('indide placeOrder()');
     List<OrderDetail> dummyData = order.orderDetails;
-    print('dummy data length: ${dummyData.length}');
     List meals = [];
 
     dummyData.forEach((f) {
       meals.add(f.toJson());
     });
-    print(meals.length);
-    print('Meals: $meals');
 
     _db.collection(ORDERS_COLLECTION).document(order.restaurant.id).setData(
       {

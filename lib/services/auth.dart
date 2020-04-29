@@ -66,7 +66,6 @@ class AuthService {
       var downloadUrl =
           await (await uploadTask.onComplete).ref.getDownloadURL();
       final url = downloadUrl.toString();
-      print('download url: $url');
       return downloadUrl;
     } catch (e) {
       print('firebase storage error: ${e.toString()}');

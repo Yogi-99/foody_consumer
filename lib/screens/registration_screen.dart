@@ -1,13 +1,17 @@
 import 'dart:io';
 
+import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:foody_consumer/models/user.dart';
+import 'package:foody_consumer/providers/user.dart';
+import 'package:foody_consumer/screens/home_screen.dart';
 import 'package:foody_consumer/screens/login_screen.dart';
 import 'package:foody_consumer/services/auth.dart';
 import 'package:foody_consumer/widget/input_field.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class RegistrationScreen extends StatefulWidget {
   static String id = 'registration_screen';
@@ -31,7 +35,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   bool _isLoading = false;
 
-  showMessage(String message) {
+  _showMessage(String message) {
     Fluttertoast.showToast(
       msg: message,
       backgroundColor: Colors.white,
@@ -48,6 +52,41 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     setState(() {
       _image = image;
     });
+  }
+
+  bool _validateFields() {
+    if (_fullName == null ||
+        _address == null ||
+        _username == null ||
+        _email == null ||
+        _password == null ||
+        _confirmPassword == null ||
+        _phone == null ||
+        _city == null) {
+      _showMessage('Please fill all the fields');
+      return false;
+    }
+    if (_password.length < 8) {
+      _showMessage('Password must be at least 8 characters long');
+      return false;
+    }
+    if (!EmailValidator.validate(_email)) {
+      _showMessage('Please provide a valid email.');
+      return false;
+    }
+    if (_image == null) {
+      _showMessage('Kindly provide an image');
+      return false;
+    }
+    if (_password != _confirmPassword) {
+      _showMessage('Both passwod do not match');
+      return false;
+    }
+    if (_username.length < 4) {
+      _showMessage('Username can not be less than 4 characters.');
+      return false;
+    }
+    return true;
   }
 
   @override
@@ -216,46 +255,48 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         padding: EdgeInsets.only(top: 20),
                         child: MaterialButton(
                           onPressed: () async {
-                            setState(() {
-                              _isLoading = true;
-                            });
-                            User user = User(
-                              email: _email,
-                              fullName: _fullName,
-                              password: _password,
-                              phone: _phone,
-                              address: _address,
-                              city: _city,
-                              username: _username,
-                              type: 'Consumer',
-                            );
-                            try {
-                              FirebaseUser firebaseUser =
-                                  await _authService.createUser(user, _image);
-                              if (firebaseUser != null) {
+                            if (_validateFields()) {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              User user = User(
+                                email: _email,
+                                fullName: _fullName,
+                                password: _password,
+                                phone: _phone,
+                                address: _address,
+                                city: _city,
+                                username: _username,
+                                type: 'Consumer',
+                              );
+                              try {
+                                FirebaseUser firebaseUser =
+                                    await _authService.createUser(user, _image);
+                                if (firebaseUser != null) {
+                                  _showMessage('User successfully created.');
+                                  Provider.of<UserProvider>(context,
+                                          listen: false)
+                                      .setCurrentUser(await _authService
+                                          .getLoggedInUserData(firebaseUser));
+                                }
                                 setState(() {
                                   _isLoading = false;
                                 });
-                                showMessage('User successfully created.');
+                                Navigator.pushNamed(context, HomeScreen.id);
+                              } catch (e) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                                _showMessage('Some error occured');
+                                print(
+                                    'Registration Screen: error: ${e.toString()}');
                               }
-                            } catch (e) {
+
                               setState(() {
                                 _isLoading = false;
                               });
-                              showMessage('Some error occured');
-                              print(
-                                  'Registration Screen: error: ${e.toString()}');
+                              _showMessage('User successfully created');
                             }
-
-                            setState(() {
-                              _isLoading = false;
-                            });
-                            showMessage('User successfully created');
-
-                            // Navigator.pushNamedAndRemoveUntil(
-                            //     context,
-                            //     BottomNavigationScreen.id,
-                            //     (Route<dynamic> route) => false);
                           }, //since this is only a UI app
                           child: Text(
                             'Register',

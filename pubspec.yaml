@@ -28,6 +28,7 @@ dependencies:
   cloud_firestore: ^0.13.5
   lottie: ^0.3.3
   fluttertoast: ^4.0.1
+  email_validator: ^1.0.4
   flutter_staggered_grid_view: ^0.3.0
 
 dev_dependencies:

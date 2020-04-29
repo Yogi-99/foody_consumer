@@ -22,15 +22,14 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: SplashScreen.id,
+        initialRoute: LoginScreen.id,
         theme: ThemeData.light().copyWith(primaryColor: Color(0xffff2d55)),
         routes: {
           SplashScreen.id: (context) => SplashScreen(),
           LoginScreen.id: (context) => LoginScreen(),
           RegistrationScreen.id: (context) => RegistrationScreen(),
           HomeScreen.id: (context) => HomeScreen(),
-          // CartScreen.id: (context) => CartScreen(),
-          // MealsScreen.id: (context) => MealsScreen(),
+          CartScreen.id: (context) => CartScreen(),
         },
       ),
     );

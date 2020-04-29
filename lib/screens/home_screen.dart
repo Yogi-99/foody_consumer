@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:foody_consumer/models/restaurant.dart';
+import 'package:foody_consumer/screens/cart_screen.dart';
 import 'package:foody_consumer/screens/meals_screen.dart';
 import 'package:foody_consumer/services/restaurant.dart';
 import 'package:foody_consumer/widget/navigation_drawer.dart';
@@ -35,11 +36,12 @@ class HomeScreen extends StatelessWidget {
                 children: [
               TextSpan(
                 text: 'ABC',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
               ),
               TextSpan(
                 text: 'Eats',
-                // style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.black.withOpacity(.8)),
               ),
             ])),
         backgroundColor: Colors.white,
@@ -127,6 +129,16 @@ class HomeScreen extends StatelessWidget {
             );
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.red,
+        onPressed: () {
+          Navigator.pushNamed(context, CartScreen.id);
+        },
+        child: Icon(
+          Icons.fastfood,
+          size: 30.0,
+        ),
       ),
     );
   }

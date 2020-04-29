@@ -34,6 +34,7 @@ class _PlaceOrderBottomSheetState extends State<PlaceOrderBottomSheet> {
     Fluttertoast.showToast(
       msg: message,
       fontSize: 18.0,
+      backgroundColor: Colors.red,
       textColor: Colors.black,
       gravity: ToastGravity.BOTTOM,
       toastLength: Toast.LENGTH_SHORT,
@@ -220,106 +221,130 @@ class _PlaceOrderBottomSheetState extends State<PlaceOrderBottomSheet> {
             ),
           ),
           // Spacer(),
-          Container(
-            padding: EdgeInsets.all(12.0),
-            height: 80,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(40),
-              boxShadow: [
-                BoxShadow(
-                  offset: Offset(0, 4),
-                  blurRadius: 50,
-                  color: Color(0xFF0D1333).withOpacity(.2),
-                ),
-              ],
-            ),
-            child: Row(
-              children: <Widget>[
-                Container(
-                  height: 60,
-                  width: 80,
-                  decoration: BoxDecoration(
-                    color: Color(0xFFFFEDEE),
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  child: Center(
-                    child: GestureDetector(
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) =>
-                                  CartScreen(restaurant: widget.restaurant))),
-                      child: Icon(
-                        Icons.shopping_cart,
-                        color: Colors.red,
-                        size: 30.0,
-                      ),
+          Consumer<OrderProvider>(
+            builder: (context, orderData, child) {
+              return Container(
+                padding: EdgeInsets.all(12.0),
+                height: 80,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(40),
+                  boxShadow: [
+                    BoxShadow(
+                      offset: Offset(0, 4),
+                      blurRadius: 50,
+                      color: Color(0xFF0D1333).withOpacity(.2),
                     ),
-                  ),
+                  ],
                 ),
-                SizedBox(width: 20),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      Uuid uuid = Uuid();
-                      String orderId = uuid.v1();
-                      OrderDetail orderDetail = OrderDetail(
-                        orderId: orderId,
-                        meal: widget.meal,
-                        restaurantName: widget.restaurant.name,
-                        quantity: quantiy.toString(),
-                        subTotal:
-                            '${_calculateTotal(int.parse(widget.meal.price), quantiy)}',
-                      );
-
-                      List<OrderDetail> orderDetails =
-                          Provider.of<OrderProvider>(context, listen: false)
-                              .orderDetails;
-                      bool _isPresent = false;
-                      // orderDetails.forEach((orderDetailIterator) {
-                      //   if (orderDetailIterator.meal.name ==
-                      //       orderDetail.meal.name) {
-                      //     _isPresent = true;
-                      //     print('ispresent true');
-                      //   }
-                      // });
-                      // print('outside $_isPresent');
-                      // if (_isPresent) {
-                      //   _showMessage('Item already in the Cart.');
-                      // } else {
-                      Provider.of<OrderProvider>(context, listen: false)
-                          .addOrderDetails(orderDetail);
-
-                      _showMessage('Item successfully added in the cart.');
-                      // }
-                      // _isPresent = false;
-
-                      // _restaurantService.placeOrder(order);
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
+                child: Row(
+                  children: <Widget>[
+                    Container(
                       height: 60,
+                      width: 80,
                       decoration: BoxDecoration(
+                        color: Color(0xFFFFEDEE),
                         borderRadius: BorderRadius.circular(40),
-                        color: Colors.red,
                       ),
                       child: Center(
-                        child: Text(
-                          "Total: ${_calculateTotal(int.parse(widget.meal.price), quantiy)}",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                        child: GestureDetector(
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => CartScreen(
+                                      restaurant: widget.restaurant))),
+                          child: Icon(
+                            Icons.shopping_cart,
+                            color: Colors.red,
+                            size: 30.0,
                           ),
                         ),
                       ),
                     ),
-                  ),
-                )
-              ],
-            ),
+                    SizedBox(width: 20),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          bool _isPresent = false;
+                          Uuid uuid = Uuid();
+                          String orderId = uuid.v1();
+                          OrderDetail orderDetail = OrderDetail(
+                            orderId: orderId,
+                            meal: widget.meal,
+                            restaurantName: widget.restaurant.name,
+                            quantity: quantiy.toString(),
+                            subTotal:
+                                '${_calculateTotal(int.parse(widget.meal.price), quantiy)}',
+                          );
+                          if (quantiy <= 0) {
+                            _showMessage('You need to add at least one item.');
+                            print('quantiy less than 0');
+                            return;
+                          }
+
+                          if (orderData.orderDetails.length == 0) {
+                            orderData.addOrderDetails(orderDetail);
+                            _showMessage(
+                                'Item successfully added in the cart.');
+                            print('Meal successfully added');
+                            return;
+                          }
+
+                          List<OrderDetail> orderDetails =
+                              orderData.orderDetails;
+
+                          orderDetails.forEach(
+                            (orderDetailIterator) {
+                              if (orderDetailIterator.meal.name ==
+                                  orderDetail.meal.name) {
+                                _showMessage('Meal already in the cart');
+                                print('meal already in cart');
+                                _isPresent = true;
+                                return;
+                              }
+                              if (orderDetailIterator.restaurantName !=
+                                  orderDetail.restaurantName) {
+                                _showMessage(
+                                    'You can not add meals from different restaurant at the same time.');
+                                print('different restuarnt ');
+                                return;
+                              }
+                            },
+                          );
+                          if (!_isPresent) {
+                            orderData.addOrderDetails(orderDetail);
+                            _showMessage(
+                                'Item successfully added in the cart.');
+                            print('outside item successfully added');
+                          }
+
+                          // _restaurantService.placeOrder(order);
+                        },
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(40),
+                            color: Colors.red,
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Total: ${_calculateTotal(int.parse(widget.meal.price), quantiy)}",
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),

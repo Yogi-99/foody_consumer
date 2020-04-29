@@ -13,7 +13,7 @@ class CartScreen extends StatefulWidget {
   static String id = 'cart_screen';
   final Restaurant restaurant;
 
-  const CartScreen({Key key, @required this.restaurant}) : super(key: key);
+  const CartScreen({Key key, this.restaurant}) : super(key: key);
 
   @override
   _CartScreenState createState() => _CartScreenState();
@@ -34,7 +34,7 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     List<OrderDetail> _orderDetails =
         Provider.of<OrderProvider>(context, listen: false).orderDetails;
-    print('cart screen');
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -93,8 +93,10 @@ class _CartScreenState extends State<CartScreen> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(20.0),
                               child: Image(
+                                height: 100.0,
+                                width: 100.0,
                                 image: NetworkImage(orderDetail.meal.image),
-                                fit: BoxFit.contain,
+                                fit: BoxFit.cover,
                               ),
                             ),
                           ),
@@ -118,9 +120,7 @@ class _CartScreenState extends State<CartScreen> {
                                       ),
                                     ),
                                     GestureDetector(
-                                      onTap: () {
-                                        print('delete tapped');
-                                      },
+                                      onTap: () {},
                                       child: Icon(
                                         Icons.delete,
                                         color: Colors.red,
@@ -285,7 +285,6 @@ class _CartScreenState extends State<CartScreen> {
                   _getTotalAmount(_orderDetails);
                   Uuid uuid = Uuid();
                   String orderId = uuid.v1();
-                  print('retaurant name : ${widget.restaurant.name}');
                   Order order = Order(
                     id: orderId,
                     createdAt: currentDateTime(),

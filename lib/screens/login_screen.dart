@@ -21,15 +21,24 @@ class _LoginScreenState extends State<LoginScreen> {
   String _email, _password;
   AuthService _authService = AuthService();
 
-  showMessage(String message) {
+  _showMessage(String message) {
     Fluttertoast.showToast(
       msg: message,
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.red,
       fontSize: 16.0,
       gravity: ToastGravity.BOTTOM,
       textColor: Colors.black,
       toastLength: Toast.LENGTH_SHORT,
     );
+  }
+
+  bool _validateFields() {
+    if (_email == null || _password == null) {
+      _showMessage('Kindly fill both the fields.');
+      return false;
+    }
+
+    return true;
   }
 
   @override
@@ -106,40 +115,44 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: EdgeInsets.only(top: 20),
                       child: MaterialButton(
                         onPressed: () async {
-                          setState(() {
-                            _isLoading = true;
-                          });
-                          try {
-                            FirebaseUser firebaseUser =
-                                await _authService.signIn(_email, _password);
+                          if (_validateFields()) {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            try {
+                              FirebaseUser firebaseUser =
+                                  await _authService.signIn(_email, _password);
 
-                            if (firebaseUser != null) {
-                              showMessage('Successfully logged in');
+                              if (firebaseUser != null) {
+                                _showMessage('Successfully logged in');
 
-                              Provider.of<UserProvider>(context, listen: false)
-                                  .setCurrentUser(await _authService
-                                      .getLoggedInUserData(firebaseUser));
-                              setState(() {
-                                _isLoading = false;
-                              });
-                              Navigator.pushNamedAndRemoveUntil(
-                                  context,
-                                  HomeScreen.id,
-                                  (Route<dynamic> route) => false);
-                            } else {
-                              showMessage('Invalid credentials');
+                                Provider.of<UserProvider>(context,
+                                        listen: false)
+                                    .setCurrentUser(await _authService
+                                        .getLoggedInUserData(firebaseUser));
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                                Navigator.pushNamedAndRemoveUntil(
+                                    context,
+                                    HomeScreen.id,
+                                    (Route<dynamic> route) => false);
+                              } else {
+                                _showMessage('Invalid credentials');
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                              }
+                            } catch (e) {
+                              print('Login Screen: error: ${e.toString()}');
+                              _showMessage('Invalid credentials');
                               setState(() {
                                 _isLoading = false;
                               });
                             }
-                          } catch (e) {
-                            print('Login Screen: error: ${e.toString()}');
-                            showMessage('Invalid credentials');
-                            setState(() {
-                              _isLoading = false;
-                            });
                           }
-                        }, //since this is only a UI app
+                        },
+                        //since this is only a UI app
                         child: Text(
                           'SIGN IN',
                           style: TextStyle(
