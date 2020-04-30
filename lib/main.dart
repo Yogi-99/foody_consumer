@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: LoginScreen.id,
+        initialRoute: SplashScreen.id,
         theme: ThemeData.light().copyWith(primaryColor: Color(0xffff2d55)),
         routes: {
           SplashScreen.id: (context) => SplashScreen(),

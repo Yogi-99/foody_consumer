@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foody_consumer/models/user.dart';
 import 'package:foody_consumer/providers/user.dart';
+import 'package:foody_consumer/screens/cart_screen.dart';
 import 'package:foody_consumer/screens/login_screen.dart';
 import 'package:foody_consumer/services/auth.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +31,7 @@ class NavigationDrawer extends StatelessWidget {
           ),
           ListTile(
             title: Text(
-              'Restaurant',
+              'Cart',
               style: TextStyle(
                   fontSize: 24.0,
                   color: Colors.black.withOpacity(.7),
@@ -45,47 +46,7 @@ class NavigationDrawer extends StatelessWidget {
               color: Colors.red,
             ),
             onTap: () {
-              // Navigator.pushNamed(context, RestaurantScreen.id);
-            },
-          ),
-          ListTile(
-            title: Text(
-              'Orders',
-              style: TextStyle(
-                  fontSize: 24.0,
-                  color: Colors.black.withOpacity(.7),
-                  fontWeight: FontWeight.bold),
-            ),
-            leading: Icon(
-              Icons.fastfood,
-              color: Colors.red,
-            ),
-            trailing: Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.red,
-            ),
-            onTap: () {
-              // Navigator.pushNamed(context, OrderScreen.id);
-            },
-          ),
-          ListTile(
-            title: Text(
-              'Meals',
-              style: TextStyle(
-                  fontSize: 24.0,
-                  color: Colors.black.withOpacity(.7),
-                  fontWeight: FontWeight.bold),
-            ),
-            leading: Icon(
-              Icons.create,
-              color: Colors.red,
-            ),
-            trailing: Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.red,
-            ),
-            onTap: () {
-              // Navigator.pushNamed(context, MealScreen.id);
+              Navigator.pushNamed(context, CartScreen.id);
             },
           ),
           Expanded(child: Container()),

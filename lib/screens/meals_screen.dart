@@ -68,12 +68,12 @@ class _MealsScreenState extends State<MealsScreen> {
                       size: 30.0,
                     ),
                     onPressed: () async {
-                      try {
-                        List<Meal> meals = await _restaurantService
-                            .getMeals(widget.restaurant);
-                      } catch (e) {
-                        print('getMeals(): error: ${e.toString()}');
-                      }
+                      showSearch(
+                          context: context,
+                          delegate: MealSearch(
+                              meals: await _restaurantService
+                                  .getMeals(widget.restaurant),
+                              restaurant: widget.restaurant));
                     },
                   ),
                 ],
@@ -181,6 +181,89 @@ class _MealsScreenState extends State<MealsScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class MealSearch extends SearchDelegate<List<Meal>> {
+  final List<Meal> meals;
+  final Restaurant restaurant;
+
+  MealSearch({this.meals, this.restaurant});
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      )
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.arrow_back_ios),
+      onPressed: () {
+        close(context, null);
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return null;
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    if (meals.isEmpty) {
+      return Container(
+        child: Center(
+          child: Text('No Data'),
+        ),
+      );
+    }
+    final suggestions =
+        meals.where((r) => r.name.toLowerCase().contains(query.toLowerCase()));
+    return ListView(
+      padding: EdgeInsets.symmetric(vertical: 10.0),
+      children: suggestions
+          .map<Container>((m) => Container(
+                padding: EdgeInsets.all(4.0),
+                child: ListTile(
+                  title: Text(m.name),
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Image.network(
+                      m.image,
+                      height: 80.0,
+                      width: 80.0,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(40.0),
+                        ),
+                      ),
+                      builder: (context) => PlaceOrderBottomSheet(
+                        meal: m,
+                        restaurant: restaurant,
+                      ),
+                    );
+                  },
+                ),
+              ))
+          .toList(),
     );
   }
 }

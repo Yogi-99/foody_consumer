@@ -120,7 +120,12 @@ class _CartScreenState extends State<CartScreen> {
                                       ),
                                     ),
                                     GestureDetector(
-                                      onTap: () {},
+                                      onTap: () {
+                                        Provider.of<OrderProvider>(context,
+                                                listen: false)
+                                            .deleteItemFromCart(orderDetail);
+                                        setState(() {});
+                                      },
                                       child: Icon(
                                         Icons.delete,
                                         color: Colors.red,

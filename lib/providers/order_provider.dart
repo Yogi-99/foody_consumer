@@ -10,4 +10,9 @@ class OrderProvider extends ChangeNotifier {
     _orderDetails.add(orderDetail);
     notifyListeners();
   }
+
+  deleteItemFromCart(OrderDetail orderDetail) {
+    _orderDetails.removeWhere((od) => orderDetail.meal.name == od.meal.name);
+    notifyListeners();
+  }
 }

@@ -267,6 +267,7 @@ class _PlaceOrderBottomSheetState extends State<PlaceOrderBottomSheet> {
                       child: GestureDetector(
                         onTap: () {
                           bool _isPresent = false;
+                          bool _differentRestaurant = false;
                           Uuid uuid = Uuid();
                           String orderId = uuid.v1();
                           OrderDetail orderDetail = OrderDetail(
@@ -303,20 +304,28 @@ class _PlaceOrderBottomSheetState extends State<PlaceOrderBottomSheet> {
                                 _isPresent = true;
                                 return;
                               }
-                              if (orderDetailIterator.restaurantName !=
-                                  orderDetail.restaurantName) {
-                                _showMessage(
-                                    'You can not add meals from different restaurant at the same time.');
-                                print('different restuarnt ');
-                                return;
-                              }
                             },
                           );
+
+                          if (orderDetails.length > 0) {
+                            if (orderDetails[0].restaurantName !=
+                                orderDetail.restaurantName) {
+                              _showMessage('Meal from different restaurant');
+                              print('meal from different restaurant');
+                              return;
+                            }
+                          }
+
                           if (!_isPresent) {
                             orderData.addOrderDetails(orderDetail);
                             _showMessage(
                                 'Item successfully added in the cart.');
                             print('outside item successfully added');
+                          }
+                          if (_differentRestaurant) {
+                            _showMessage(
+                                'You can not add meals from different restaurant at the same time.');
+                            print('different restuarnt ');
                           }
 
                           // _restaurantService.placeOrder(order);

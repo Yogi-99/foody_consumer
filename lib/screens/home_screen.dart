@@ -27,7 +27,11 @@ class HomeScreen extends StatelessWidget {
                 color: Colors.red,
               ),
               onPressed: () async {
-                _restaurantService.getRestaurants();
+                showSearch(
+                    context: context,
+                    delegate: RestaurantSearch(
+                      restaurants: await _restaurantService.getRestaurants(),
+                    ));
               }),
         ],
         title: RichText(
@@ -236,4 +240,78 @@ _buildRestaurantList(List<Restaurant> restaurants, BuildContext context) {
     );
   });
   return Column(children: restaurantList);
+}
+
+class RestaurantSearch extends SearchDelegate<List<Restaurant>> {
+  final List<Restaurant> restaurants;
+  Restaurant restaurant;
+
+  RestaurantSearch({this.restaurants});
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      )
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+        icon: Icon(Icons.arrow_back_ios),
+        onPressed: () {
+          close(context, null);
+        });
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return Container();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    if (restaurants.isEmpty) {
+      return Container(
+        child: Center(
+          child: Text('No Data'),
+        ),
+      );
+    }
+
+    final suggestions = restaurants
+        .where((r) => r.name.toLowerCase().contains(query.toLowerCase()));
+    return ListView(
+      padding: EdgeInsets.symmetric(vertical: 10.0),
+      children: suggestions
+          .map<Container>((r) => Container(
+                padding: EdgeInsets.all(4.0),
+                child: ListTile(
+                  title: Text(r.name),
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Image.network(
+                      r.image,
+                      height: 80.0,
+                      width: 80.0,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => MealsScreen(
+                                  restaurant: r,
+                                )));
+                  },
+                ),
+              ))
+          .toList(),
+    );
+  }
 }
